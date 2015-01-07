@@ -40,17 +40,16 @@ class DefaultConfig(BaseConfig):
     # Flask-Sqlalchemy: http://packages.python.org/Flask-SQLAlchemy/config.html
     SQLALCHEMY_ECHO = True
     # SQLITE for prototyping.
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + INSTANCE_FOLDER_PATH + '/db.sqlite'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + BaseConfig.INSTANCE_FOLDER_PATH + '/db.sqlite'
     # MYSQL for production.
     #SQLALCHEMY_DATABASE_URI = 'mysql://username:password@server/db?charset=utf8'
-
-    # Flask-babel: http://pythonhosted.org/Flask-Babel/
-    ACCEPT_LANGUAGES = ['zh']
-    BABEL_DEFAULT_LOCALE = 'en'
 
     # Flask-cache: http://pythonhosted.org/Flask-Cache/
     CACHE_TYPE = 'simple'
     CACHE_DEFAULT_TIMEOUT = 60
+
+    # Flask.security: https://pythonhosted.org/Flask-Security/
+    SECURITY_REGISTERABLE = True
 
     # Flask-mail: http://pythonhosted.org/flask-mail/
     # https://bitbucket.org/danjac/flask-mail/issue/3/problem-with-gmails-smtp-server
@@ -65,7 +64,7 @@ class DefaultConfig(BaseConfig):
     MAIL_DEFAULT_SENDER = MAIL_USERNAME
 
     # Flask-openid: http://pythonhosted.org/Flask-OpenID/
-    OPENID_FS_STORE_PATH = os.path.join(INSTANCE_FOLDER_PATH, 'openid')
+    OPENID_FS_STORE_PATH = os.path.join(BaseConfig.INSTANCE_FOLDER_PATH, 'openid')
     make_dir(OPENID_FS_STORE_PATH)
 
 

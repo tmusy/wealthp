@@ -2,29 +2,28 @@
 
 import os
 
-from flask import Flask, request, render_template
-from flask.ext.babel import Babel
+from flask import Flask, render_template
+from flask.ext.security import SQLAlchemyUserDatastore, login_required
 
 from .config import DefaultConfig
-from .user import User, user
-from .settings import settings
-from .frontend import frontend
-from .api import api
-from .admin import admin
-from .extensions import db, mail, cache, login_manager, oid
-from .utils import INSTANCE_FOLDER_PATH
+from .user import User, Role
+#from .settings import settings
+#from .frontend import frontend
+#from .api import api
+#from .admin import admin
+from .extensions import db, mail, cache, security
 
 
 # For import *
 __all__ = ['create_app']
 
-DEFAULT_BLUEPRINTS = (
-    frontend,
-    user,
-    settings,
-    api,
-    admin,
-)
+# DEFAULT_BLUEPRINTS = (
+#     frontend,
+#     user,
+#     settings,
+#     api,
+#     admin,
+# )
 
 
 def create_app(config=None, app_name=None, blueprints=None):
@@ -32,10 +31,10 @@ def create_app(config=None, app_name=None, blueprints=None):
 
     if app_name is None:
         app_name = DefaultConfig.PROJECT
-    if blueprints is None:
-        blueprints = DEFAULT_BLUEPRINTS
+#    if blueprints is None:
+#        blueprints = DEFAULT_BLUEPRINTS
 
-    app = Flask(app_name, instance_path=INSTANCE_FOLDER_PATH, instance_relative_config=True)
+    app = Flask(app_name, instance_path=DefaultConfig.INSTANCE_FOLDER_PATH, instance_relative_config=True)
     configure_app(app, config)
     configure_hook(app)
     configure_blueprints(app, blueprints)
@@ -43,6 +42,12 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_logging(app)
     configure_template_filters(app)
     configure_error_handlers(app)
+
+    # Views
+    @app.route('/')
+    @login_required
+    def home():
+        return render_template('index.html')
 
     return app
 
@@ -74,25 +79,9 @@ def configure_extensions(app):
     # flask-cache
     cache.init_app(app)
 
-    # flask-babel
-    babel = Babel(app)
-
-    @babel.localeselector
-    def get_locale():
-        accept_languages = app.config.get('ACCEPT_LANGUAGES')
-        return request.accept_languages.best_match(accept_languages)
-
-    # flask-login
-    login_manager.login_view = 'frontend.login'
-    login_manager.refresh_view = 'frontend.reauth'
-
-    @login_manager.user_loader
-    def load_user(id):
-        return User.query.get(id)
-    login_manager.setup_app(app)
-
-    # flask-openid
-    oid.init_app(app)
+    # flask-security
+    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+    security.init_app(app, datastore=user_datastore)
 
 
 def configure_blueprints(app, blueprints):
@@ -174,3 +163,8 @@ def configure_error_handlers(app):
     @app.errorhandler(500)
     def server_error_page(error):
         return render_template("errors/server_error.html"), 500
+
+
+if __name__ == '__main__':
+    app = create_app()
+    app.run()
