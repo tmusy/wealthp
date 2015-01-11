@@ -5,25 +5,25 @@ import os
 from flask import Flask, render_template
 from flask.ext.security import SQLAlchemyUserDatastore, login_required
 
-from .config import DefaultConfig
-from .user import User, Role
+from config import DefaultConfig
+from user import User, Role
 #from .settings import settings
 #from .frontend import frontend
 #from .api import api
 #from .admin import admin
-from .extensions import db, mail, cache, security
+from extensions import db, mail, security
 
 
 # For import *
 __all__ = ['create_app']
 
-# DEFAULT_BLUEPRINTS = (
+DEFAULT_BLUEPRINTS = (
 #     frontend,
 #     user,
 #     settings,
 #     api,
 #     admin,
-# )
+)
 
 
 def create_app(config=None, app_name=None, blueprints=None):
@@ -31,8 +31,8 @@ def create_app(config=None, app_name=None, blueprints=None):
 
     if app_name is None:
         app_name = DefaultConfig.PROJECT
-#    if blueprints is None:
-#        blueprints = DEFAULT_BLUEPRINTS
+    if blueprints is None:
+        blueprints = DEFAULT_BLUEPRINTS
 
     app = Flask(app_name, instance_path=DefaultConfig.INSTANCE_FOLDER_PATH, instance_relative_config=True)
     configure_app(app, config)
@@ -75,9 +75,6 @@ def configure_extensions(app):
 
     # flask-mail
     mail.init_app(app)
-
-    # flask-cache
-    cache.init_app(app)
 
     # flask-security
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
@@ -145,6 +142,10 @@ def configure_logging(app):
 
 
 def configure_hook(app):
+    @app.before_first_request
+    def create_db():
+        pass
+
     @app.before_request
     def before_request():
         pass

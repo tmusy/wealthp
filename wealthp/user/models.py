@@ -3,8 +3,8 @@
 from sqlalchemy import Column
 from flask.ext.security import UserMixin, RoleMixin
 
-from ..extensions import db
-from .constants import SEX_TYPE
+from wealthp.extensions import db
+from constants import SEX_TYPE
 
 
 # Define models
@@ -29,7 +29,7 @@ class User(db.Model, UserMixin):
                             backref=db.backref('users', lazy='dynamic'))
 
     # additional fields
-    name = Column(db.String(80), nullable=False, unique=True)
+    name = Column(db.String(80))
 
     sex_code = db.Column(db.Integer)
 
