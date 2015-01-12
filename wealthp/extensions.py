@@ -17,3 +17,6 @@ security = Security()
 
 from flask.ext.admin import Admin
 admin = Admin()
+
+from flask.ext.restless import APIManager
+api = APIManager()

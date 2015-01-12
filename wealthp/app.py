@@ -12,7 +12,7 @@ from user import User, Role
 #from .frontend import frontend
 #from .api import api
 #from .admin import admin
-from extensions import db, mail, security, admin
+from extensions import db, mail, security, admin, api
 
 
 # For import *
@@ -85,6 +85,11 @@ def configure_extensions(app):
     admin.init_app(app)
     admin.add_view(ModelView(User, db.session))
     admin.add_view(ModelView(Role, db.session))
+
+    # flask-restless
+    api.init_app(app, flask_sqlalchemy_db=db)
+    api.create_api(User, methods=['GET', 'POST', 'DELETE'])
+    # e.g. url für get is: http://127.0.0.1:5000/api/user/1
 
 
 def configure_blueprints(app, blueprints):
