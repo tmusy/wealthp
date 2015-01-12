@@ -14,3 +14,6 @@ security = Security()
 
 #from flask.ext.openid import OpenID
 #oid = OpenID()
+
+from flask.ext.admin import Admin
+admin = Admin()

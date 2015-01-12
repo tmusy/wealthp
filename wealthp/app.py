@@ -4,6 +4,7 @@ import os
 
 from flask import Flask, render_template
 from flask.ext.security import SQLAlchemyUserDatastore, login_required
+from flask.ext.admin.contrib.sqla import ModelView
 
 from config import DefaultConfig
 from user import User, Role
@@ -11,7 +12,7 @@ from user import User, Role
 #from .frontend import frontend
 #from .api import api
 #from .admin import admin
-from extensions import db, mail, security
+from extensions import db, mail, security, admin
 
 
 # For import *
@@ -79,6 +80,11 @@ def configure_extensions(app):
     # flask-security
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, datastore=user_datastore)
+
+    # flask-admin
+    admin.init_app(app)
+    admin.add_view(ModelView(User, db.session))
+    admin.add_view(ModelView(Role, db.session))
 
 
 def configure_blueprints(app, blueprints):
